@@ -43,6 +43,16 @@ public class TeleOpMode extends OpMode {
     public void loop() {
         thanosCar.ocLift(gamepad1.right_trigger);
         thanosCar.ocDontLift(gamepad1.left_trigger);
+        thanosCar.setWheelPower(gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x,
+                                gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x,
+                                gamepad1.left_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x,
+                                gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x,
+        );
+        
+        /*if(!thanosCar.deadZone(gamepad1.right_stick_x) && thanosCar.deadZone(gamepad1.right_stick_y)){
+            
+        }*/
+        
         /*thanosCar.setWheelPower(gamepad1.right_stick_y,gamepad1.left_stick_y
                 /*(reverse ? gamepad1.right_stick_y : -gamepad1.left_stick_y) * wheelSpeed,
                 (reverse ? gamepad1.left_stick_y : -gamepad1.right_stick_y) * wheelSpeed);*/

@@ -36,6 +36,11 @@ public class Hardware {
 
     void init(HardwareMap hardwareMap) {
         lifter = hardwareMap.dcMotor.get("lifter");
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        backLeft = hardwareMap.dcMotor.get("backLeft");
+        backRight = hardwareMap.dcMotor.get("backRight");
+
         /*leftSlide     = hardwareMap.dcMotor.get("leftSlide");
         rightSlide    = hardwareMap.dcMotor.get("rightSlide");
         leftConveyor  = hardwareMap.dcMotor.get("leftConveyor");
@@ -74,6 +79,28 @@ public class Hardware {
         telemetry.update();
     }
 
+    void ocLift(float liftPower) {
+        lifter.setPower(liftPower);
+    }
+    void ocDontLift(float liftPower){
+        lifter.setPower(-1*liftPower);
+    }
+    boolean deadZone(float joystickJaunt){
+        if(joystickJaunt<0.2){
+            return true;
+        }
+        else{
+            return false;
+        }
+    }
+
+    void setWheelPower(float frontLeftPower, float frontRightPower, float backLeftPower, float backRightPower) {
+        backLeft.setPower(backLeftPower);
+        frontLeft.setPower(frontLeftPower);
+        frontRight.setPower(frontRightPower);
+        backRight.setPower(backRightPower);
+    }
+
     void setServoPositions() {
         /*flipper     .setPosition(.9);
         claw        .setPosition(0);
@@ -104,19 +131,9 @@ public class Hardware {
         return clawArm.getCurrentPosition();
     }*/
 
-    /*void setWheelPower(double leftPower, double rightPower) {
-        backLeft.setPower(leftPower);
-        frontLeft.setPower(leftPower);
-        frontRight.setPower(rightPower);
-        backRight.setPower(rightPower);
-    }*/
+    
 
-    void ocLift(float liftPower) {
-        lifter.setPower(liftPower);
-    }
-    void ocDontLift(float liftPower){
-        lifter.setPower(-1*liftPower);
-    }
+    
     /*void setCenterPower(double power) {
         centerWheel.setPower(power);
     }
