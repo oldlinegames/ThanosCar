@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.content.Context;
+import android.media.MediaPlayer;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -24,7 +27,10 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleOpMode extends OpMode {
     private static final double CLAW_ARM_SPEED = .25;
     private final Hardware thanosCar = new Hardware();
+    private OmaeTron omaeWa  = new OmaeTron();
+    private apagando sombra = new apagando();
     private double wheelSpeed = 1;
+    private boolean lastYPressed = false;
     //private double slideSpeed = 1;
     //private boolean prevB1, prevX1, prevX2, prevY2, reverse, clawControl;
 
@@ -36,21 +42,55 @@ public class TeleOpMode extends OpMode {
 
     @Override
     public void start() {
-        thanosCar.setServoPositions();
+        thanosCar.setServoPositions(0);
     }
 
     @Override
     public void loop() {
+        lastYPressed = gamepad1.y;
         thanosCar.ocLift(gamepad1.right_trigger);
         thanosCar.ocDontLift(gamepad1.left_trigger);
-        thanosCar.setWheelPower(gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x,
-                                gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x,
-                                gamepad1.left_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x,
-                                gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x,
+        thanosCar.setWheelPower(-1*(-1*gamepad1.left_stick_y + gamepad1.right_stick_x + -1*gamepad1.left_stick_x),
+                -1*(-1*gamepad1.left_stick_y - gamepad1.right_stick_x - -1*gamepad1.left_stick_x),
+                -1*(-1*gamepad1.left_stick_y - gamepad1.right_stick_x + -1*gamepad1.left_stick_x),
+                                -1*gamepad1.left_stick_y+ gamepad1.right_stick_x - -1*gamepad1.left_stick_x
         );
+        if(gamepad2.right_bumper){
+            thanosCar.ocSlide(1);
+        }
+
+        else if(gamepad2.left_bumper){
+            thanosCar.ocSlide(-1);
+        }
+        else
+        {
+            thanosCar.ocSlide(0);
+        }
+
+        if(gamepad1.y && !lastYPressed){
+            thanosCar.setDoorJaunt();
+        }
+        if(gamepad1.a){
+            thanosCar.setServoPositions(1);
+            //gamepad1.left_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x;
+        }
+
+        else if(gamepad1.b){
+            thanosCar.setServoPositions(-1);
+        }
         
-        /*if(!thanosCar.deadZone(gamepad1.right_stick_x) && thanosCar.deadZone(gamepad1.right_stick_y)){
-            
+        else{
+            thanosCar.setServoPositions(0);
+        }
+        thanosCar.ocSpin(gamepad2.left_stick_y*0.9);
+        thanosCar.ocSpin(gamepad2.right_stick_y);
+
+
+        /*if(gamepad1.x){
+            omaeWa.start(this.hardwareMap.appContext);
+        }
+        if(gamepad1.y){
+            sombra.start(this.hardwareMap.appContext);
         }*/
         
         /*thanosCar.setWheelPower(gamepad1.right_stick_y,gamepad1.left_stick_y

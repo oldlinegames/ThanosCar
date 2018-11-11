@@ -1,8 +1,12 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.media.MediaPlayer;
+
+import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -21,7 +25,12 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 public class Hardware {
     //private ColorSensor colorSensor;
-    private DcMotor lifter, frontLeft, frontRight, backLeft, backRight;
+    private ElapsedTime     runtime = new ElapsedTime();
+    private DcMotor spinner, lifter, slider, frontLeft, frontRight, backLeft, backRight;
+    private CRServo spinnyLeft, spinnyRight;
+    private Servo doorJaunt;
+    private boolean closed = true;
+
 
     /*private Servo flipper, claw, jewelSweeper;
     private boolean flipperDown, clawClosed;*/
@@ -35,11 +44,20 @@ public class Hardware {
     }
 
     void init(HardwareMap hardwareMap) {
+        spinner = hardwareMap.dcMotor.get("spinner");
         lifter = hardwareMap.dcMotor.get("lifter");
+        slider = hardwareMap.dcMotor.get("slider");
         frontLeft = hardwareMap.dcMotor.get("frontLeft");
         frontRight = hardwareMap.dcMotor.get("frontRight");
         backLeft = hardwareMap.dcMotor.get("backLeft");
         backRight = hardwareMap.dcMotor.get("backRight");
+
+        spinnyLeft = hardwareMap.crservo.get("left");
+        spinnyRight = hardwareMap.crservo.get("right");
+        doorJaunt = hardwareMap.servo.get("door");
+
+       /* lifter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
 
         /*leftSlide     = hardwareMap.dcMotor.get("leftSlide");
         rightSlide    = hardwareMap.dcMotor.get("rightSlide");
@@ -79,19 +97,30 @@ public class Hardware {
         telemetry.update();
     }
 
+    void setWheelEncoderMode(){
+        frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        telemetry.addLine("Encoders Initialized");
+        telemetry.update();
+    }
+
     void ocLift(float liftPower) {
         lifter.setPower(liftPower);
     }
     void ocDontLift(float liftPower){
         lifter.setPower(-1*liftPower);
     }
-    boolean deadZone(float joystickJaunt){
-        if(joystickJaunt<0.2){
-            return true;
-        }
-        else{
-            return false;
-        }
+
+    void ocSlide(float slidePower){
+        slider.setPower(slidePower/2);
     }
 
     void setWheelPower(float frontLeftPower, float frontRightPower, float backLeftPower, float backRightPower) {
@@ -101,11 +130,109 @@ public class Hardware {
         backRight.setPower(backRightPower);
     }
 
-    void setServoPositions() {
-        /*flipper     .setPosition(.9);
-        claw        .setPosition(0);
-        jewelSweeper.setPosition(.5);*/
+    void setServoPositions(float powerJaunt) {
+        spinnyRight.setPower(powerJaunt);
+        spinnyLeft.setPower(-1*powerJaunt);
     }
+
+    void setDoorJaunt(){
+        if(closed){
+            doorJaunt.setPosition(0);
+        }
+        else{
+            doorJaunt.setPosition(0.5);
+        }
+        closed = !closed;
+
+    }
+
+    void ocSpin(double power){
+        spinner.setPower(power);
+    }
+
+
+    static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // eg: TETRIX Motor Encoder
+    static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
+    static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
+    static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
+            (WHEEL_DIAMETER_INCHES * 3.1415);
+    static final double     DRIVE_SPEED             = 0.6;
+    static final double     TURN_SPEED              = 0.5;
+
+
+    /*
+    public void encoderDrive(double speed,
+                             double leftInches, double rightInches,
+                             double timeoutS) {
+        int newFrontLeftTarget;
+        int newBackLeftTarget;
+        int newFrontRightTarget;
+        int newBackRightTarget;
+
+        // Ensure that the opmode is still active
+
+            // Determine new target position, and pass to motor controller
+            newFrontLeftTarget = frontLeft.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
+            newBackLeftTarget = backLeft.getCurrentPosition() + (int)(leftInches*COUNTS_PER_INCH);
+            newFrontRightTarget = frontRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+            newBackRightTarget = backRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+
+
+            backLeft.setTargetPosition(newBackLeftTarget);
+            frontLeft.setTargetPosition(newFrontLeftTarget);
+            backRight.setTargetPosition(newBackRightTarget);
+            frontRight.setTargetPosition(newFrontRightTarget);
+
+            // Turn On RUN_TO_POSITION
+            backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+            // reset the timeout time and start motion.
+            runtime.reset();
+            frontLeft.setPower(Math.abs(speed));
+            backLeft.setPower(Math.abs(speed));
+            frontRight.setPower(Math.abs(speed));
+            backRight.setPower(Math.abs(speed));
+
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (opModeIsActive() &&
+                    (runtime.seconds() < timeoutS) &&
+                    (robot.leftDrive.isBusy() && robot.rightDrive.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
+                telemetry.addData("Path2",  "Running at %7d :%7d",
+                        robot.leftDrive.getCurrentPosition(),
+                        robot.rightDrive.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            robot.leftDrive.setPower(0);
+            robot.rightDrive.setPower(0);
+
+            // Turn off RUN_TO_POSITION
+            robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+            robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            //  sleep(250);   // optional pause after each move
+        }
+    }
+
+    */
+
+
+    //void door(float power){
+        //doorJaunt.setPower(power);
+    //}
 
     /*void initVuforia() {
         telemetry.addLine("Initializing Vuforia");
