@@ -56,6 +56,9 @@ public class Hardware {
         spinnyRight = hardwareMap.crservo.get("right");
         doorJaunt = hardwareMap.servo.get("door");
 
+        flipper = hardwareMap.servo.get("flipper");
+        colorJaunt = hardwareMap.colorSensor.get("colorJaunt");
+
        /* lifter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         lifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
 
@@ -160,7 +163,7 @@ public class Hardware {
     static final double     TURN_SPEED              = 0.5;
 
 
-    /*
+    
     public void encoderDrive(double speed,
                              double leftInches, double rightInches,
                              double timeoutS) {
@@ -223,16 +226,37 @@ public class Hardware {
             robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
             robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-            //  sleep(250);   // optional pause after each move
+            sleep(250);   // optional pause after each move
         }
     }
 
-    */
+    float red1;
+    float red2;
 
+    public void mineralSample {
+        flipper.setPosition(0.6); // lower flipper with color sensor
+        sleep(500);
+        red1 = colorJaunt.red(); // record red value of the first mineral
+        if(red1 < 0.5){
+            encoderDrive(0.4, 12, -12, 5.0); //turn the robot, knocking out the 1st mineral 
+        }
+        else{
+            flipper.setPosition(0); // raise the flipper again
+            sleep(500);
+            encoderDrive(0.5, 6.0, 6.0, 10); // drive forward to next mineral 
+            flipper.setPosition(0.6); // lower flipper again
+            red2 = colorJaunt.red(); // record red value of the second mineral
 
-    //void door(float power){
-        //doorJaunt.setPower(power);
-    //}
+            if(red2 < 0.5){
+                encoderDrive(0.4, 12, -12, 5.0); //turn the robot, knocking out the 2nd mineral   
+            }
+            else{
+                encoderDrive(0.4, -12, 12, 5.0); //turn the robot in the other direction, knocking out the 3rd mineral   
+            }
+        }
+        
+        
+    } 
 
     /*void initVuforia() {
         telemetry.addLine("Initializing Vuforia");
@@ -254,53 +278,7 @@ public class Hardware {
         telemetry.update();
     }
 
-    int getGetClawArmPos() {
-        return clawArm.getCurrentPosition();
-    }*/
-
     
-
-    
-    /*void setCenterPower(double power) {
-        centerWheel.setPower(power);
-    }
-
-    void setClawArmPower(double power) {
-        clawArm.setPower(power);
-    }
-
-    void toggleFlipper() {
-        flipperDown ^= true;
-        if (flipperDown) {
-            flipper.setPosition(.25);
-        } else {
-            flipper.setPosition(.9);
-        }
-        telemetry.addData("Flipper Down", flipperDown);
-        telemetry.update();
-    }
-
-    void toggleClaw() {
-        clawClosed = !clawClosed;
-        if (clawClosed) {
-            claw.setPosition(.5);
-        } else {
-            claw.setPosition(0);
-        }
-    }
-
-    void setLeftSlidePower(double power) {
-        leftSlide.setPower(power);
-    }
-
-    void setRightSlidePower(double power) {
-        rightSlide.setPower(power);
-    }
-
-    void setConveyorPower(double leftPower, double rightPower) {
-        leftConveyor .setPower(leftPower);
-        rightConveyor.setPower(rightPower);
-    }
 
     void wheelBrake(boolean brake) {
         if (brake) {
