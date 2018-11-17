@@ -2,6 +2,8 @@ package org.firstinspires.ftc.teamcode;
 
 import android.media.MediaPlayer;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.ColorSensor;
 import com.qualcomm.robotcore.hardware.DcMotor;
@@ -28,8 +30,10 @@ public class Hardware {
     private ElapsedTime     runtime = new ElapsedTime();
     private DcMotor spinner, lifter, slider, frontLeft, frontRight, backLeft, backRight;
     private CRServo spinnyLeft, spinnyRight;
-    private Servo doorJaunt;
+    private Servo doorJaunt, flipper;
     private boolean closed = true;
+    private ColorSensor colorJaunt;
+    private LinearOpMode OpModeJaunt;
 
 
     /*private Servo flipper, claw, jewelSweeper;
@@ -38,6 +42,12 @@ public class Hardware {
     /*private final ElapsedTime runtime = new ElapsedTime();
 
     private VuforiaTrackable relicTemplate;*/
+    Hardware(LinearOpMode nojons){
+        OpModeJaunt =  nojons;
+    }
+
+    Hardware() {
+    }
 
     void setTelemetry(Telemetry telemetry) {
         this.telemetry = telemetry;
@@ -111,6 +121,8 @@ public class Hardware {
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
+        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
         telemetry.addLine("Encoders Initialized");
         telemetry.update();
     }
@@ -174,75 +186,79 @@ public class Hardware {
 
         // Ensure that the opmode is still active
 
-            // Determine new target position, and pass to motor controller
-            newFrontLeftTarget = frontLeft.getCurrentPosition() + (int)(leftInches * COUNTS_PER_INCH);
-            newBackLeftTarget = backLeft.getCurrentPosition() + (int)(leftInches*COUNTS_PER_INCH);
-            newFrontRightTarget = frontRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
-            newBackRightTarget = backRight.getCurrentPosition() + (int)(rightInches * COUNTS_PER_INCH);
+        // Determine new target position, and pass to motor controller
+        //newFrontLeftTarget = frontLeft.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+        newBackLeftTarget = backLeft.getCurrentPosition() + (int) (1.1*leftInches * COUNTS_PER_INCH);
+        //newFrontRightTarget = frontRight.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
+        newBackRightTarget = backRight.getCurrentPosition() + (int) (1.1*rightInches * COUNTS_PER_INCH);
 
 
-            backLeft.setTargetPosition(newBackLeftTarget);
-            frontLeft.setTargetPosition(newFrontLeftTarget);
-            backRight.setTargetPosition(newBackRightTarget);
-            frontRight.setTargetPosition(newFrontRightTarget);
+        backLeft.setTargetPosition(newBackLeftTarget);
+        //frontLeft.setTargetPosition(newFrontLeftTarget);
+        backRight.setTargetPosition(newBackRightTarget);
+        //frontRight.setTargetPosition(newFrontRightTarget);
 
-            // Turn On RUN_TO_POSITION
-            backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-            frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        // Turn On RUN_TO_POSITION
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        //frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-            // reset the timeout time and start motion.
-            runtime.reset();
-            frontLeft.setPower(Math.abs(speed));
-            backLeft.setPower(Math.abs(speed));
-            frontRight.setPower(Math.abs(speed));
-            backRight.setPower(Math.abs(speed));
+        // reset the timeout time and start motion.
+        runtime.reset();
+        //frontLeft.setPower(Math.abs(speed));
+        backLeft.setPower(Math.abs(speed));
+        //frontRight.setPower(Math.abs(speed));
+        backRight.setPower(Math.abs(speed));
 
 
-            // keep looping while we are still active, and there is time left, and both motors are running.
-            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
-            // its target position, the motion will stop.  This is "safer" in the event that the robot will
-            // always end the motion as soon as possible.
-            // However, if you require that BOTH motors have finished their moves before the robot continues
-            // onto the next step, use (isBusy() || isBusy()) in the loop test.
-            while (opModeIsActive() &&
-                    (runtime.seconds() < timeoutS) &&
-                    (robot.leftDrive.isBusy() && robot.rightDrive.isBusy())) {
+        // keep looping while we are still active, and there is time left, and both motors are running.
+        // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+        // its target position, the motion will stop.  This is "safer" in the event that the robot will
+        // always end the motion as soon as possible.
+        // However, if you require that BOTH motors have finished their moves before the robot continues
+        // onto the next step, use (isBusy() || isBusy()) in the loop test.
+        while (OpModeJaunt.opModeIsActive() &&
+                (runtime.seconds() < timeoutS) &&
+                (backLeft.isBusy() && backRight.isBusy())) {
 
-                // Display it for the driver.
-                telemetry.addData("Path1",  "Running to %7d :%7d", newLeftTarget,  newRightTarget);
-                telemetry.addData("Path2",  "Running at %7d :%7d",
-                        robot.leftDrive.getCurrentPosition(),
-                        robot.rightDrive.getCurrentPosition());
-                telemetry.update();
-            }
-
-            // Stop all motion;
-            robot.leftDrive.setPower(0);
-            robot.rightDrive.setPower(0);
-
-            // Turn off RUN_TO_POSITION
-            robot.leftDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-            robot.rightDrive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-            sleep(250);   // optional pause after each move
+            // Display it for the driver.
+            telemetry.addData("Path1", "Running to %7d :%7d", newBackLeftTarget, newBackRightTarget);
+            telemetry.addData("Path2", "Running at %7d :%7d",
+                    backLeft.getCurrentPosition(),
+                    backRight.getCurrentPosition());
+            telemetry.update();
         }
+
+        // Stop all motion;
+        frontRight.setPower(0);
+        backRight.setPower(0);
+        frontLeft.setPower(0);
+        backLeft.setPower(0);
+
+        // Turn off RUN_TO_POSITION
+        //frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        OpModeJaunt.sleep(250);   // optional pause after each move
     }
 
     float red1;
     float red2;
 
-    public void mineralSample {
+    public void mineralSample() {
+        colorJaunt.enableLed(true);
         flipper.setPosition(0.6); // lower flipper with color sensor
-        sleep(500);
+        OpModeJaunt.sleep(500);
         red1 = colorJaunt.red(); // record red value of the first mineral
         if(red1 < 0.5){
             encoderDrive(0.4, 12, -12, 5.0); //turn the robot, knocking out the 1st mineral 
         }
         else{
             flipper.setPosition(0); // raise the flipper again
-            sleep(500);
+            OpModeJaunt.sleep(500);
             encoderDrive(0.5, 6.0, 6.0, 10); // drive forward to next mineral 
             flipper.setPosition(0.6); // lower flipper again
             red2 = colorJaunt.red(); // record red value of the second mineral
