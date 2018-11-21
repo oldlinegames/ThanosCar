@@ -14,11 +14,12 @@ public class autonomus extends LinearOpMode{
         thanosCar = new Hardware(this);
         thanosCar.setTelemetry(telemetry);
         thanosCar.init(hardwareMap);
+        thanosCar.reverseWheels();
 
         thanosCar.setWheelEncoderMode();
         waitForStart();
 
-        thanosCar.encoderDrive(0.5,-10,-10,10);
+        thanosCar.encoderDrive(0.5,10,10,10);
 
 
     }

@@ -31,6 +31,7 @@ public class TeleOpMode extends OpMode {
     private apagando sombra = new apagando();
     private double wheelSpeed = 1;
     private boolean lastYPressed = false;
+    private boolean slowMode = false;
     //private double slideSpeed = 1;
     //private boolean prevB1, prevX1, prevX2, prevY2, reverse, clawControl;
 
@@ -43,6 +44,7 @@ public class TeleOpMode extends OpMode {
     @Override
     public void start() {
         thanosCar.setServoPositions(0);
+        thanosCar.reverseWheels();
     }
 
     @Override
@@ -50,11 +52,21 @@ public class TeleOpMode extends OpMode {
         lastYPressed = gamepad1.y;
         thanosCar.ocLift(gamepad1.right_trigger);
         thanosCar.ocDontLift(gamepad1.left_trigger);
-        thanosCar.setWheelPower(-1*(-1*gamepad1.left_stick_y + gamepad1.right_stick_x + -1*gamepad1.left_stick_x),
-                -1*(-1*gamepad1.left_stick_y - gamepad1.right_stick_x - -1*gamepad1.left_stick_x),
-                -1*(-1*gamepad1.left_stick_y - gamepad1.right_stick_x + -1*gamepad1.left_stick_x),
-                                -1*gamepad1.left_stick_y+ gamepad1.right_stick_x - -1*gamepad1.left_stick_x
-        );
+        if(slowMode){
+            thanosCar.setWheelPower((gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x)/3,
+                    (gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x)/3,
+                    (gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x)/3,
+                    (gamepad1.left_stick_y+ gamepad1.right_stick_x - gamepad1.left_stick_x)/3
+            );
+        }
+        else{
+            thanosCar.setWheelPower(gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x,
+                    gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x,
+                    gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x,
+                    gamepad1.left_stick_y+ gamepad1.right_stick_x - gamepad1.left_stick_x
+            );
+        }
+
         if(gamepad2.right_bumper){
             thanosCar.ocSlide(1);
         }
@@ -82,8 +94,27 @@ public class TeleOpMode extends OpMode {
         else{
             thanosCar.setServoPositions(0);
         }
-        thanosCar.ocSpin(gamepad2.left_stick_y*0.9);
+        thanosCar.ocSpin(gamepad2.left_stick_y*0.93);
         thanosCar.ocSpin(gamepad2.right_stick_y);
+
+        while(gamepad2.dpad_up){
+            thanosCar.ocSpin(-0.9);
+        }
+
+        while(gamepad2.dpad_down){
+            thanosCar.ocSpin(0.9);
+        }
+
+        if(gamepad1.dpad_down){
+            slowMode = true;
+            telemetry.addLine("Slow Mode Enabled");
+            telemetry.update();
+        }
+        else if(gamepad1.dpad_up){
+            slowMode = false;
+            telemetry.addLine("Slow Mode Disabled");
+            telemetry.update();
+        }
 
 
         /*if(gamepad1.x){

@@ -110,6 +110,11 @@ public class Hardware {
         telemetry.update();
     }
 
+    void reverseWheels(){
+        backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+        frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
+    }
+
     void setWheelEncoderMode(){
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -121,7 +126,7 @@ public class Hardware {
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        backRight.setDirection(DcMotorSimple.Direction.REVERSE);
+
 
         telemetry.addLine("Encoders Initialized");
         telemetry.update();
@@ -155,7 +160,7 @@ public class Hardware {
             doorJaunt.setPosition(0);
         }
         else{
-            doorJaunt.setPosition(0.5);
+            doorJaunt.setPosition(0.8);
         }
         closed = !closed;
 
@@ -187,28 +192,28 @@ public class Hardware {
         // Ensure that the opmode is still active
 
         // Determine new target position, and pass to motor controller
-        //newFrontLeftTarget = frontLeft.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
-        newBackLeftTarget = backLeft.getCurrentPosition() + (int) (1.1*leftInches * COUNTS_PER_INCH);
-        //newFrontRightTarget = frontRight.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
-        newBackRightTarget = backRight.getCurrentPosition() + (int) (1.1*rightInches * COUNTS_PER_INCH);
+        newFrontLeftTarget = frontLeft.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+        newBackLeftTarget = backLeft.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+        newFrontRightTarget = frontRight.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
+        newBackRightTarget = backRight.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
 
 
         backLeft.setTargetPosition(newBackLeftTarget);
-        //frontLeft.setTargetPosition(newFrontLeftTarget);
+        frontLeft.setTargetPosition(newFrontLeftTarget);
         backRight.setTargetPosition(newBackRightTarget);
-        //frontRight.setTargetPosition(newFrontRightTarget);
+        frontRight.setTargetPosition(newFrontRightTarget);
 
         // Turn On RUN_TO_POSITION
         backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
         // reset the timeout time and start motion.
         runtime.reset();
-        //frontLeft.setPower(Math.abs(speed));
+        frontLeft.setPower(Math.abs(speed));
         backLeft.setPower(Math.abs(speed));
-        //frontRight.setPower(Math.abs(speed));
+        frontRight.setPower(Math.abs(speed));
         backRight.setPower(Math.abs(speed));
 
 
@@ -237,9 +242,9 @@ public class Hardware {
         backLeft.setPower(0);
 
         // Turn off RUN_TO_POSITION
-        //frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         OpModeJaunt.sleep(250);   // optional pause after each move
