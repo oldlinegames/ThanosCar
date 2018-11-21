@@ -277,7 +277,21 @@ public class Hardware {
         }
         
         
-    } 
+    }
+
+    public void colorSensorTest(){
+        colorJaunt.enableLed(true);
+        telemetry.addLine(Integer.toString(colorJaunt.red()));
+        telemetry.update();
+        /*if(colorJaunt.red()<0.5){
+            telemetry.addLine("yellow");
+            telemetry.update();
+        }
+        else if(colorJaunt.red()>0.5){
+            telemetry.addLine("white");
+            telemetry.update();
+        }*/
+    }
 
     /*void initVuforia() {
         telemetry.addLine("Initializing Vuforia");

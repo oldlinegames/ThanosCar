@@ -116,7 +116,7 @@ public class TeleOpMode extends OpMode {
             telemetry.update();
         }
 
-
+        thanosCar.colorSensorTest();
         /*if(gamepad1.x){
             omaeWa.start(this.hardwareMap.appContext);
         }
