@@ -9,6 +9,7 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 public class autonomus extends LinearOpMode{
     private Hardware thanosCar;
 
+
     @Override
     public void runOpMode() throws InterruptedException {
         thanosCar = new Hardware(this);
@@ -19,7 +20,18 @@ public class autonomus extends LinearOpMode{
         thanosCar.setWheelEncoderMode();
         waitForStart();
 
+        thanosCar.ocDontLift(1);
+        sleep(1000);
+        thanosCar.ocDontLift(0);
+        thanosCar.setWheelPower(0.5,-0.5,-0.5,-0.5); // strafe out of the hook
+        sleep(500);
+        thanosCar.setWheelPower(0,0,0,0);
         thanosCar.encoderDrive(0.5,10,10,10);
+        thanosCar.mineralSample();
+        thanosCar.encoderDrive(0.5,10,10,10);
+        sleep(500);
+        thanosCar.marker.setPosition(0);
+        sleep(500);
 
 
     }

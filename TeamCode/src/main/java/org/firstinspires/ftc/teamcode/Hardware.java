@@ -15,9 +15,15 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
+import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
+import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
+import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 import org.firstinspires.ftc.robotcore.external.navigation.RelicRecoveryVuMark;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaLocalizer;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackable;
+import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackableDefaultListener;
 import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
 
 /**
@@ -25,20 +31,24 @@ import org.firstinspires.ftc.robotcore.external.navigation.VuforiaTrackables;
  * and controlling the robot.
  */
 
+
 public class Hardware {
     //private ColorSensor colorSensor;
     private ElapsedTime     runtime = new ElapsedTime();
     private DcMotor spinner, lifter, slider, frontLeft, frontRight, backLeft, backRight;
     private CRServo spinnyLeft, spinnyRight;
     private Servo doorJaunt, flipper;
+    public Servo marker;
     private boolean closed = true;
     private ColorSensor colorJaunt;
     private LinearOpMode OpModeJaunt;
 
-
+    private VuforiaTrackables navTargets;
+    private OpenGLMatrix lastPos;
     /*private Servo flipper, claw, jewelSweeper;
     private boolean flipperDown, clawClosed;*/
     private Telemetry telemetry;
+    private HardwareMap hardwareMap;
     /*private final ElapsedTime runtime = new ElapsedTime();
 
     private VuforiaTrackable relicTemplate;*/
@@ -46,14 +56,10 @@ public class Hardware {
         OpModeJaunt =  nojons;
     }
 
-    Hardware() {
-    }
-
-    void setTelemetry(Telemetry telemetry) {
+    Hardware(HardwareMap hardwareMap, Telemetry telemetry) {
+        this.hardwareMap = hardwareMap;
         this.telemetry = telemetry;
-    }
 
-    void init(HardwareMap hardwareMap) {
         spinner = hardwareMap.dcMotor.get("spinner");
         lifter = hardwareMap.dcMotor.get("lifter");
         slider = hardwareMap.dcMotor.get("slider");
@@ -65,6 +71,29 @@ public class Hardware {
         spinnyLeft = hardwareMap.crservo.get("left");
         spinnyRight = hardwareMap.crservo.get("right");
         doorJaunt = hardwareMap.servo.get("door");
+        marker = hardwareMap.servo.get("marker");
+
+        flipper = hardwareMap.servo.get("flipper");
+        colorJaunt = hardwareMap.colorSensor.get("colorJaunt");
+    }
+
+    void setTelemetry(Telemetry telemetry) {
+
+    }
+
+    /*void init(HardwareMap hardwareMap) {
+        spinner = hardwareMap.dcMotor.get("spinner");
+        lifter = hardwareMap.dcMotor.get("lifter");
+        slider = hardwareMap.dcMotor.get("slider");
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        backLeft = hardwareMap.dcMotor.get("backLeft");
+        backRight = hardwareMap.dcMotor.get("backRight");
+
+        spinnyLeft = hardwareMap.crservo.get("left");
+        spinnyRight = hardwareMap.crservo.get("right");
+        doorJaunt = hardwareMap.servo.get("door");
+        marker = hardwareMap.servo.get("marker");
 
         flipper = hardwareMap.servo.get("flipper");
         colorJaunt = hardwareMap.colorSensor.get("colorJaunt");
@@ -104,11 +133,11 @@ public class Hardware {
         wheelBrake(false);
         leftSlide .setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        clawArm   .setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);*/
+        clawArm   .setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addLine("Initialized Hardware");
         telemetry.update();
-    }
+    }*/
 
     void reverseWheels(){
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -143,7 +172,7 @@ public class Hardware {
         slider.setPower(slidePower/2);
     }
 
-    void setWheelPower(float frontLeftPower, float frontRightPower, float backLeftPower, float backRightPower) {
+    void setWheelPower(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower) {
         backLeft.setPower(backLeftPower);
         frontLeft.setPower(frontLeftPower);
         frontRight.setPower(frontRightPower);
@@ -279,6 +308,10 @@ public class Hardware {
         
     }
 
+    public void placeMarker(){
+        marker.setPosition(1);
+
+    }
     public void colorSensorTest(){
         colorJaunt.enableLed(true);
         telemetry.addLine(Integer.toString(colorJaunt.red()));
@@ -293,6 +326,89 @@ public class Hardware {
         }*/
     }
 
+    void initVuforia() {
+        telemetry.addLine("Initializing Vuforia");
+        telemetry.update();
+
+        int cameraMonitorViewId = hardwareMap.appContext.getResources()
+                .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
+        VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
+
+        parameters.vuforiaLicenseKey = "AZLv+a7/////AAAAGdyzndpq4khMnz5IMjSvhiR0XbtOlL7ZfQytGj9s" +
+                "4zFCFoa+IqUA1Cjv4ghfSjfRAlRguu6cVbQVM+0Rxladi3AIKhUjIL6v5ToFrK/fxrWdwAzkQfEPM1S" +
+                "3ijrTSm1N8DuZ6UoqiKoVmQGzyiWhDpTQoR1zIVkj88rOhBDYwBf0CnW++pxZ0pHlQBbh/bzBjt63AN" +
+                "cuI9JyHU3/JLGSBhoIm04G3UnrjVrjKfPFlX9NOwWQLOYjQ+4B1l4M8u9BdihYgmfMST0BHON+MQ7qC" +
+                "5dMs/2OSZlSKSZISN/L+x606xzc2Sv5G+ULUpaUiChG7Zlv/rncu337WhZjJ1X2pQGY7gIBcSH+TUw8" +
+                "1n2jYKkm";
+        parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
+
+        VuforiaLocalizer vuforiaLocalizer = ClassFactory.getInstance().createVuforia(parameters);
+        navTargets = vuforiaLocalizer.loadTrackablesFromAsset("RoverRuckus");
+
+        VuforiaTrackable frontTarget = navTargets.get(2);
+        VuforiaTrackable redTarget   = navTargets.get(1);
+        VuforiaTrackable backTarget  = navTargets.get(3);
+        VuforiaTrackable blueTarget  = navTargets.get(0);
+
+        frontTarget .setName("FrontWall");
+        redTarget   .setName("RedWall");
+        backTarget  .setName("BackWall");
+        blueTarget  .setName("BlueWall");
+
+        final float mmPerInch = 25.4f;
+        final float fieldWidth = 72 * mmPerInch;
+        final float targetHeight = 6 * mmPerInch;
+
+        frontTarget.setLocation(OpenGLMatrix
+                .translation(-fieldWidth, 0, targetHeight)
+                .multiplied(Orientation.getRotationMatrix(
+                        AxesReference.EXTRINSIC, AxesOrder.XYZ,
+                        AngleUnit.DEGREES, 90, 0, 90
+                )));
+
+        redTarget.setLocation(OpenGLMatrix
+                .translation(0, -fieldWidth, targetHeight)
+                .multiplied(Orientation.getRotationMatrix(
+                        AxesReference.EXTRINSIC, AxesOrder.XYZ,
+                        AngleUnit.DEGREES, 90, 0, 180
+                )));
+
+        backTarget.setLocation(OpenGLMatrix
+                .translation(fieldWidth, 0, targetHeight)
+                .multiplied(Orientation.getRotationMatrix(
+                        AxesReference.EXTRINSIC, AxesOrder.XYZ,
+                        AngleUnit.DEGREES, 90, 0, -90
+                )));
+
+        blueTarget.setLocation(OpenGLMatrix
+                .translation(0, fieldWidth, targetHeight)
+                .multiplied(Orientation.getRotationMatrix(
+                        AxesReference.EXTRINSIC, AxesOrder.XYZ,
+                        AngleUnit.DEGREES, 90, 0, 0
+                )));
+
+        for (VuforiaTrackable navTarget : navTargets) {
+            telemetry.addData(navTarget.getName(), navTarget.getLocation().formatAsTransform());
+        }
+
+        OpenGLMatrix phoneLocation = OpenGLMatrix
+                .translation(-140, -140, 345)
+                .multiplied(Orientation.getRotationMatrix(
+                        AxesReference.EXTRINSIC, AxesOrder.XYZ,
+                        AngleUnit.DEGREES, 90, 0, -90
+                ));
+        telemetry.addData("Phone", phoneLocation.formatAsTransform());
+
+        for (VuforiaTrackable target : navTargets) {
+            ((VuforiaTrackableDefaultListener) target.getListener())
+                    .setPhoneInformation(phoneLocation, parameters.cameraDirection);
+        }
+
+        navTargets.activate();
+
+        telemetry.addLine("Initialized Vuforia");
+        telemetry.update();
+    }
     /*void initVuforia() {
         telemetry.addLine("Initializing Vuforia");
         telemetry.update();
