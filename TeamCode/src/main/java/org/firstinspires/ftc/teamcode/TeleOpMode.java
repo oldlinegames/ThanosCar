@@ -26,7 +26,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp
 public class TeleOpMode extends OpMode {
     private static final double CLAW_ARM_SPEED = .25;
-    private final Hardware thanosCar = new Hardware(hardwareMap, telemetry);
+    private Hardware thanosCar;
     private OmaeTron omaeWa  = new OmaeTron();
     private apagando sombra = new apagando();
     private double wheelSpeed = 1;
@@ -37,7 +37,7 @@ public class TeleOpMode extends OpMode {
 
     @Override
     public void init() {
-        thanosCar=
+        thanosCar=new Hardware(hardwareMap,telemetry);
     }
 
     @Override
@@ -59,10 +59,10 @@ public class TeleOpMode extends OpMode {
             );
         }
         else{
-            thanosCar.setWheelPower(gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x,
-                    gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x,
-                    gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x,
-                    gamepad1.left_stick_y+ gamepad1.right_stick_x - gamepad1.left_stick_x
+            thanosCar.setWheelPower((gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x)*0.5,
+                    (gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x)*0.5,
+                    (gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x)*0.5,
+                    (gamepad1.left_stick_y+ gamepad1.right_stick_x - gamepad1.left_stick_x)*0.5
             );
         }
 
@@ -114,8 +114,7 @@ public class TeleOpMode extends OpMode {
             telemetry.addLine("Slow Mode Disabled");
             telemetry.update();
         }
-
-        thanosCar.colorSensorTest();
+        //thanosCar.colorSensorTest();
         /*if(gamepad1.x){
             omaeWa.start(this.hardwareMap.appContext);
         }

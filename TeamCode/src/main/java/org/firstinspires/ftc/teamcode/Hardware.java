@@ -16,6 +16,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.ClassFactory;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
+import org.firstinspires.ftc.robotcore.external.matrices.VectorF;
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
 import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
@@ -45,6 +46,8 @@ public class Hardware {
 
     private VuforiaTrackables navTargets;
     private OpenGLMatrix lastPos;
+    private OpenGLMatrix targetPos = new OpenGLMatrix();
+
     /*private Servo flipper, claw, jewelSweeper;
     private boolean flipperDown, clawClosed;*/
     private Telemetry telemetry;
@@ -52,8 +55,26 @@ public class Hardware {
     /*private final ElapsedTime runtime = new ElapsedTime();
 
     private VuforiaTrackable relicTemplate;*/
-    Hardware(LinearOpMode nojons){
+    Hardware(HardwareMap hardwareMap, Telemetry telemetry, LinearOpMode nojons){
         OpModeJaunt =  nojons;
+        this.hardwareMap = hardwareMap;
+        this.telemetry = telemetry;
+
+        spinner = hardwareMap.dcMotor.get("spinner");
+        lifter = hardwareMap.dcMotor.get("lifter");
+        slider = hardwareMap.dcMotor.get("slider");
+        frontLeft = hardwareMap.dcMotor.get("frontLeft");
+        frontRight = hardwareMap.dcMotor.get("frontRight");
+        backLeft = hardwareMap.dcMotor.get("backLeft");
+        backRight = hardwareMap.dcMotor.get("backRight");
+
+        spinnyLeft = hardwareMap.crservo.get("left");
+        spinnyRight = hardwareMap.crservo.get("right");
+        doorJaunt = hardwareMap.servo.get("door");
+        marker = hardwareMap.servo.get("marker");
+
+        flipper = hardwareMap.servo.get("flipper");
+        colorJaunt = hardwareMap.colorSensor.get("colorJaunt");
     }
 
     Hardware(HardwareMap hardwareMap, Telemetry telemetry) {
@@ -144,7 +165,7 @@ public class Hardware {
         frontLeft.setDirection(DcMotorSimple.Direction.REVERSE);
     }
 
-    void setWheelEncoderMode(){
+    void setWheelEncoderModeAuto(){
         frontLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -155,7 +176,10 @@ public class Hardware {
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-
+        frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addLine("Encoders Initialized");
         telemetry.update();
@@ -200,7 +224,7 @@ public class Hardware {
     }
 
 
-    static final double     COUNTS_PER_MOTOR_REV    = 1120 ;    // eg: TETRIX Motor Encoder
+    static final double     COUNTS_PER_MOTOR_REV    = 560 ;    // eg: TETRIX Motor Encoder
     static final double     DRIVE_GEAR_REDUCTION    = 1.0 ;     // This is < 1.0 if geared UP
     static final double     WHEEL_DIAMETER_INCHES   = 4.0 ;     // For figuring circumference
     static final double     COUNTS_PER_INCH         = (COUNTS_PER_MOTOR_REV * DRIVE_GEAR_REDUCTION) /
@@ -279,6 +303,83 @@ public class Hardware {
         OpModeJaunt.sleep(250);   // optional pause after each move
     }
 
+    public void encoderStrafe(double speed,
+                             double leftInches, double rightInches,
+                             double timeoutS) {
+        int newFrontLeftTarget;
+        int newBackLeftTarget;
+        int newFrontRightTarget;
+        int newBackRightTarget;
+
+        // Ensure that the opmode is still active
+
+        // Determine new target position, and pass to motor controller
+        newFrontLeftTarget = frontLeft.getCurrentPosition() + (int) (leftInches * COUNTS_PER_INCH);
+        newBackLeftTarget = backLeft.getCurrentPosition() -(int) (leftInches * COUNTS_PER_INCH);
+        newFrontRightTarget = frontRight.getCurrentPosition() - (int) (rightInches * COUNTS_PER_INCH);
+        newBackRightTarget = backRight.getCurrentPosition() + (int) (rightInches * COUNTS_PER_INCH);
+
+
+        backLeft.setTargetPosition(newBackLeftTarget);
+        frontLeft.setTargetPosition(newFrontLeftTarget);
+        backRight.setTargetPosition(newBackRightTarget);
+        frontRight.setTargetPosition(newFrontRightTarget);
+
+        // Turn On RUN_TO_POSITION
+        backLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontLeft.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        backRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        frontRight.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // reset the timeout time and start motion.
+        runtime.reset();
+        frontLeft.setPower(Math.abs(speed));
+        backLeft.setPower(Math.abs(speed));
+        frontRight.setPower(Math.abs(speed));
+        backRight.setPower(Math.abs(speed));
+
+
+        // keep looping while we are still active, and there is time left, and both motors are running.
+        // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+        // its target position, the motion will stop.  This is "safer" in the event that the robot will
+        // always end the motion as soon as possible.
+        // However, if you require that BOTH motors have finished their moves before the robot continues
+        // onto the next step, use (isBusy() || isBusy()) in the loop test.
+        while (OpModeJaunt.opModeIsActive() &&
+                (runtime.seconds() < timeoutS) &&
+                (backLeft.isBusy() && backRight.isBusy())) {
+
+            // Display it for the driver.
+            telemetry.addData("Path1", "Running to %7d :%7d", newBackLeftTarget, newBackRightTarget);
+            telemetry.addData("Path2", "Running at %7d :%7d",
+                    backLeft.getCurrentPosition(),
+                    backRight.getCurrentPosition());
+            telemetry.update();
+        }
+
+        // Stop all motion;
+        frontRight.setPower(0);
+        backRight.setPower(0);
+        frontLeft.setPower(0);
+        backLeft.setPower(0);
+
+        // Turn off RUN_TO_POSITION
+        frontLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backLeft.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        OpModeJaunt.sleep(250);   // optional pause after each move
+    }
+
+    double rightTurnInches;
+    double leftTurnInches;
+    public void encoderTurn(float degrees, int direction){
+        rightTurnInches = direction*degrees*71.15/360;
+        leftTurnInches = direction*-1*degrees*71.15/360;
+
+        encoderDrive(0.1,leftTurnInches,rightTurnInches,10);
+    }
     float red1;
     float red2;
 
@@ -334,12 +435,7 @@ public class Hardware {
                 .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
-        parameters.vuforiaLicenseKey = "AZLv+a7/////AAAAGdyzndpq4khMnz5IMjSvhiR0XbtOlL7ZfQytGj9s" +
-                "4zFCFoa+IqUA1Cjv4ghfSjfRAlRguu6cVbQVM+0Rxladi3AIKhUjIL6v5ToFrK/fxrWdwAzkQfEPM1S" +
-                "3ijrTSm1N8DuZ6UoqiKoVmQGzyiWhDpTQoR1zIVkj88rOhBDYwBf0CnW++pxZ0pHlQBbh/bzBjt63AN" +
-                "cuI9JyHU3/JLGSBhoIm04G3UnrjVrjKfPFlX9NOwWQLOYjQ+4B1l4M8u9BdihYgmfMST0BHON+MQ7qC" +
-                "5dMs/2OSZlSKSZISN/L+x606xzc2Sv5G+ULUpaUiChG7Zlv/rncu337WhZjJ1X2pQGY7gIBcSH+TUw8" +
-                "1n2jYKkm";
+        parameters.vuforiaLicenseKey = "Ab/JnEL/////AAABmW7Uy6NAxUirvMBXEz5yeXkwIl5parKZlMBcX9M+jJHCNuLt4xjJ3cgEjL7SO42TDVxc1WxrGyojiZTm0P6a7wuARu2YSyevlsEOtbJEugQLwV/gpdln7GTfjkQeCsPPXOnqA+WoXWsoAoapAUsCtYOR9/31p2Hga0hhIJkhKW4IyPOSqxughlVmWakL/qb4o5moNzh2XMv27YlD4k/C1sd5hIvWCkVXo+lFJ5IX4QciPWm4x840zzqsGoYg3/0Azc12bmuC/cAEcEXNvbcd7/K2LmUnCEguffNPgerDVa4PbksEtnqwAMY4uKN2q2KuWSYytla+3xF8AYxOS4Cmce/k3tRJvt+fz+TneBmcCXZ9\n";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
         VuforiaLocalizer vuforiaLocalizer = ClassFactory.getInstance().createVuforia(parameters);
@@ -395,7 +491,7 @@ public class Hardware {
                 .translation(-140, -140, 345)
                 .multiplied(Orientation.getRotationMatrix(
                         AxesReference.EXTRINSIC, AxesOrder.XYZ,
-                        AngleUnit.DEGREES, 90, 0, -90
+                        AngleUnit.DEGREES, 0, -90, 0
                 ));
         telemetry.addData("Phone", phoneLocation.formatAsTransform());
 
@@ -408,6 +504,71 @@ public class Hardware {
 
         telemetry.addLine("Initialized Vuforia");
         telemetry.update();
+    }
+
+    void setTargetPos(OpenGLMatrix targetPos) {
+        this.targetPos = targetPos;
+    }
+
+    boolean adjustPosition(LinearOpMode opMode) {
+        ElapsedTime runtime = new ElapsedTime();
+        runtime.reset();
+        while (runtime.milliseconds() < 500) {
+            opMode.idle();
+        }
+        OpenGLMatrix location = getRobotLocation();
+
+        if (location == null) {
+            return false;
+        } else {
+            telemetry.addLine("Location found!");
+            telemetry.update();
+            VectorF diff = targetPos.getTranslation().subtracted(location.getTranslation());
+
+            float locationAngle = Orientation.getOrientation(location, AxesReference.EXTRINSIC,
+                    AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+            telemetry.addData("Location Angle", locationAngle);
+            float targetAngle = Orientation.getOrientation(targetPos, AxesReference.EXTRINSIC,
+                    AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+            telemetry.addData("Target Angle", targetAngle);
+            telemetry.addData("Location", location.formatAsTransform());
+            telemetry.addData("Target", targetPos.formatAsTransform());
+            telemetry.update();
+
+
+            // Go to x of target
+            encoderTurn(locationAngle,-1);
+            encoderDrive(0.1, diff.getData()[0]/25.4, diff.getData()[0]/25.4,10);
+
+            // Go to y of target
+            encoderTurn(90,-1);
+            encoderDrive(0.1, diff.getData()[1]/25.4, diff.getData()[1]/25.4,10);
+
+            // Go to angle of target
+            encoderTurn(targetAngle-90,-1);
+
+            return true;
+        }
+    }
+
+    OpenGLMatrix getRobotLocation() {
+        VuforiaTrackable visible = null;
+        for (VuforiaTrackable trackable : navTargets) {
+            if (((VuforiaTrackableDefaultListener) trackable.getListener()).isVisible()) {
+                visible = trackable;
+                break;
+            }
+        }
+
+        if (visible == null) {
+            return null;
+        }
+
+        OpenGLMatrix pos = ((VuforiaTrackableDefaultListener) visible.getListener()).getUpdatedRobotLocation();
+        if (pos != null) {
+            lastPos = pos;
+        }
+        return lastPos;
     }
     /*void initVuforia() {
         telemetry.addLine("Initializing Vuforia");
