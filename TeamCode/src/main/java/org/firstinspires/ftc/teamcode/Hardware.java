@@ -102,63 +102,6 @@ public class Hardware {
 
     }
 
-    /*void init(HardwareMap hardwareMap) {
-        spinner = hardwareMap.dcMotor.get("spinner");
-        lifter = hardwareMap.dcMotor.get("lifter");
-        slider = hardwareMap.dcMotor.get("slider");
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        backLeft = hardwareMap.dcMotor.get("backLeft");
-        backRight = hardwareMap.dcMotor.get("backRight");
-
-        spinnyLeft = hardwareMap.crservo.get("left");
-        spinnyRight = hardwareMap.crservo.get("right");
-        doorJaunt = hardwareMap.servo.get("door");
-        marker = hardwareMap.servo.get("marker");
-
-        flipper = hardwareMap.servo.get("flipper");
-        colorJaunt = hardwareMap.colorSensor.get("colorJaunt");
-
-       /* lifter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
-
-        /*leftSlide     = hardwareMap.dcMotor.get("leftSlide");
-        rightSlide    = hardwareMap.dcMotor.get("rightSlide");
-        leftConveyor  = hardwareMap.dcMotor.get("leftConveyor");
-        rightConveyor = hardwareMap.dcMotor.get("rightConveyor");
-        leftWheel     = hardwareMap.dcMotor.get("leftWheel");
-        rightWheel    = hardwareMap.dcMotor.get("rightWheel");
-        centerWheel   = hardwareMap.dcMotor.get("centerWheel");
-        clawArm       = hardwareMap.dcMotor.get("clawArm");
-        flipper       = hardwareMap.servo.get("flipper");
-        claw          = hardwareMap.servo.get("claw");
-        jewelSweeper  = hardwareMap.servo.get("jewelSweeper");
-        colorSensor   = hardwareMap.colorSensor.get("colorSensor");
-
-        leftSlide .setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftWheel .setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        clawArm   .setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftWheel .setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftSlide .setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        clawArm   .setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        leftSlide    .setDirection(DcMotorSimple.Direction.REVERSE);
-        rightConveyor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightWheel   .setDirection(DcMotorSimple.Direction.REVERSE);
-        centerWheel  .setDirection(DcMotorSimple.Direction.REVERSE);
-
-        wheelBrake(false);
-        leftSlide .setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        clawArm   .setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        telemetry.addLine("Initialized Hardware");
-        telemetry.update();
-    }*/
 
     void reverseWheels(){
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -426,7 +369,7 @@ public class Hardware {
             telemetry.update();
         }*/
     }
-
+    "Ab/JnEL/////AAABmW7Uy6NAxUirvMBXEz5yeXkwIl5parKZlMBcX9M+jJHCNuLt4xjJ3cgEjL7SO42TDVxc1WxrGyojiZTm0P6a7wuARu2YSyevlsEOtbJEugQLwV/gpdln7GTfjkQeCsPPXOnqA+WoXWsoAoapAUsCtYOR9/31p2Hga0hhIJkhKW4IyPOSqxughlVmWakL/qb4o5moNzh2XMv27YlD4k/C1sd5hIvWCkVXo+lFJ5IX4QciPWm4x840zzqsGoYg3/0Azc12bmuC/cAEcEXNvbcd7/K2LmUnCEguffNPgerDVa4PbksEtnqwAMY4uKN2q2KuWSYytla+3xF8AYxOS4Cmce/k3tRJvt+fz+TneBmcCXZ9\n"
     void initVuforia() {
         telemetry.addLine("Initializing Vuforia");
         telemetry.update();
@@ -435,7 +378,12 @@ public class Hardware {
                 .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
-        parameters.vuforiaLicenseKey = "Ab/JnEL/////AAABmW7Uy6NAxUirvMBXEz5yeXkwIl5parKZlMBcX9M+jJHCNuLt4xjJ3cgEjL7SO42TDVxc1WxrGyojiZTm0P6a7wuARu2YSyevlsEOtbJEugQLwV/gpdln7GTfjkQeCsPPXOnqA+WoXWsoAoapAUsCtYOR9/31p2Hga0hhIJkhKW4IyPOSqxughlVmWakL/qb4o5moNzh2XMv27YlD4k/C1sd5hIvWCkVXo+lFJ5IX4QciPWm4x840zzqsGoYg3/0Azc12bmuC/cAEcEXNvbcd7/K2LmUnCEguffNPgerDVa4PbksEtnqwAMY4uKN2q2KuWSYytla+3xF8AYxOS4Cmce/k3tRJvt+fz+TneBmcCXZ9\n";
+        parameters.vuforiaLicenseKey = "AZLv+a7/////AAAAGdyzndpq4khMnz5IMjSvhiR0XbtOlL7ZfQytGj9s" +
+                "4zFCFoa+IqUA1Cjv4ghfSjfRAlRguu6cVbQVM+0Rxladi3AIKhUjIL6v5ToFrK/fxrWdwAzkQfEPM1S" +
+                "3ijrTSm1N8DuZ6UoqiKoVmQGzyiWhDpTQoR1zIVkj88rOhBDYwBf0CnW++pxZ0pHlQBbh/bzBjt63AN" +
+                "cuI9JyHU3/JLGSBhoIm04G3UnrjVrjKfPFlX9NOwWQLOYjQ+4B1l4M8u9BdihYgmfMST0BHON+MQ7qC" +
+                "5dMs/2OSZlSKSZISN/L+x606xzc2Sv5G+ULUpaUiChG7Zlv/rncu337WhZjJ1X2pQGY7gIBcSH+TUw8" +
+                "1n2jYKkm";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
         VuforiaLocalizer vuforiaLocalizer = ClassFactory.getInstance().createVuforia(parameters);
@@ -510,7 +458,7 @@ public class Hardware {
         this.targetPos = targetPos;
     }
 
-    boolean adjustPosition(LinearOpMode opMode) {
+    boolean toPosition(OpenGLMatrix targetPos, LinearOpMode opMode) {
         ElapsedTime runtime = new ElapsedTime();
         runtime.reset();
         while (runtime.milliseconds() < 500) {
@@ -523,29 +471,36 @@ public class Hardware {
         } else {
             telemetry.addLine("Location found!");
             telemetry.update();
+
             VectorF diff = targetPos.getTranslation().subtracted(location.getTranslation());
 
             float locationAngle = Orientation.getOrientation(location, AxesReference.EXTRINSIC,
                     AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
-            telemetry.addData("Location Angle", locationAngle);
             float targetAngle = Orientation.getOrientation(targetPos, AxesReference.EXTRINSIC,
                     AxesOrder.XYZ, AngleUnit.DEGREES).thirdAngle;
+
+            telemetry.addData("Location Angle", locationAngle);
             telemetry.addData("Target Angle", targetAngle);
             telemetry.addData("Location", location.formatAsTransform());
             telemetry.addData("Target", targetPos.formatAsTransform());
             telemetry.update();
 
-
             // Go to x of target
-            encoderTurn(locationAngle,-1);
-            encoderDrive(0.1, diff.getData()[0]/25.4, diff.getData()[0]/25.4,10);
+            
+            //turnLeft(-locationAngle, .3, 5_000, opMode);
+            //driveForward(diff.getData()[0], .3, 5_000, opMode);
+            thanosCar.encoderTurn(-locationAngle,-1);
+            thanosCar.encoderDrive[0.2, diff.getData()[0], diff.getData()[0], 5];
 
             // Go to y of target
-            encoderTurn(90,-1);
-            encoderDrive(0.1, diff.getData()[1]/25.4, diff.getData()[1]/25.4,10);
+            //turnLeft(90, .3, 5_000, opMode);
+            //driveForward(diff.getData()[1], .3, 5_000, opMode);
+            thanosCar.encoderTurn(90, -1);
+            thanosCar.encoderDrive(0.2, diff.getData()[1], diff.getData()[1], 5);
 
             // Go to angle of target
-            encoderTurn(targetAngle-90,-1);
+            //turnLeft(targetAngle - 90, .3, 5_000, opMode);
+            thanosCar.encoderTurn(targetAngle - 90, -1);
 
             return true;
         }

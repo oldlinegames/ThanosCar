@@ -93,7 +93,7 @@ import java.util.Locale;
  */
 
 @TeleOp(name="Concept: Vuforia Nav Webcam", group ="Concept")
-@Disabled
+
 public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
 
     public static final String TAG = "Vuforia Navigation Sample";
@@ -147,7 +147,7 @@ public class ConceptVuforiaNavigationWebcam extends LinearOpMode {
          * Once you've obtained a license key, copy the string from the Vuforia web site
          * and paste it in to your code on the next line, between the double quotes.
          */
-        parameters.vuforiaLicenseKey = " -- YOUR NEW VUFORIA KEY GOES HERE  --- ";
+        parameters.vuforiaLicenseKey = "Ab/JnEL/////AAABmW7Uy6NAxUirvMBXEz5yeXkwIl5parKZlMBcX9M+jJHCNuLt4xjJ3cgEjL7SO42TDVxc1WxrGyojiZTm0P6a7wuARu2YSyevlsEOtbJEugQLwV/gpdln7GTfjkQeCsPPXOnqA+WoXWsoAoapAUsCtYOR9/31p2Hga0hhIJkhKW4IyPOSqxughlVmWakL/qb4o5moNzh2XMv27YlD4k/C1sd5hIvWCkVXo+lFJ5IX4QciPWm4x840zzqsGoYg3/0Azc12bmuC/cAEcEXNvbcd7/K2LmUnCEguffNPgerDVa4PbksEtnqwAMY4uKN2q2KuWSYytla+3xF8AYxOS4Cmce/k3tRJvt+fz+TneBmcCXZ9";
 
         /**
          * We also indicate which camera on the RC we wish to use.
