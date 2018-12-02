@@ -369,7 +369,7 @@ public class Hardware {
             telemetry.update();
         }*/
     }
-    "Ab/JnEL/////AAABmW7Uy6NAxUirvMBXEz5yeXkwIl5parKZlMBcX9M+jJHCNuLt4xjJ3cgEjL7SO42TDVxc1WxrGyojiZTm0P6a7wuARu2YSyevlsEOtbJEugQLwV/gpdln7GTfjkQeCsPPXOnqA+WoXWsoAoapAUsCtYOR9/31p2Hga0hhIJkhKW4IyPOSqxughlVmWakL/qb4o5moNzh2XMv27YlD4k/C1sd5hIvWCkVXo+lFJ5IX4QciPWm4x840zzqsGoYg3/0Azc12bmuC/cAEcEXNvbcd7/K2LmUnCEguffNPgerDVa4PbksEtnqwAMY4uKN2q2KuWSYytla+3xF8AYxOS4Cmce/k3tRJvt+fz+TneBmcCXZ9\n"
+    
     void initVuforia() {
         telemetry.addLine("Initializing Vuforia");
         telemetry.update();
@@ -378,12 +378,7 @@ public class Hardware {
                 .getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
         VuforiaLocalizer.Parameters parameters = new VuforiaLocalizer.Parameters(cameraMonitorViewId);
 
-        parameters.vuforiaLicenseKey = "AZLv+a7/////AAAAGdyzndpq4khMnz5IMjSvhiR0XbtOlL7ZfQytGj9s" +
-                "4zFCFoa+IqUA1Cjv4ghfSjfRAlRguu6cVbQVM+0Rxladi3AIKhUjIL6v5ToFrK/fxrWdwAzkQfEPM1S" +
-                "3ijrTSm1N8DuZ6UoqiKoVmQGzyiWhDpTQoR1zIVkj88rOhBDYwBf0CnW++pxZ0pHlQBbh/bzBjt63AN" +
-                "cuI9JyHU3/JLGSBhoIm04G3UnrjVrjKfPFlX9NOwWQLOYjQ+4B1l4M8u9BdihYgmfMST0BHON+MQ7qC" +
-                "5dMs/2OSZlSKSZISN/L+x606xzc2Sv5G+ULUpaUiChG7Zlv/rncu337WhZjJ1X2pQGY7gIBcSH+TUw8" +
-                "1n2jYKkm";
+        parameters.vuforiaLicenseKey = "Ab/JnEL/////AAABmW7Uy6NAxUirvMBXEz5yeXkwIl5parKZlMBcX9M+jJHCNuLt4xjJ3cgEjL7SO42TDVxc1WxrGyojiZTm0P6a7wuARu2YSyevlsEOtbJEugQLwV/gpdln7GTfjkQeCsPPXOnqA+WoXWsoAoapAUsCtYOR9/31p2Hga0hhIJkhKW4IyPOSqxughlVmWakL/qb4o5moNzh2XMv27YlD4k/C1sd5hIvWCkVXo+lFJ5IX4QciPWm4x840zzqsGoYg3/0Azc12bmuC/cAEcEXNvbcd7/K2LmUnCEguffNPgerDVa4PbksEtnqwAMY4uKN2q2KuWSYytla+3xF8AYxOS4Cmce/k3tRJvt+fz+TneBmcCXZ9\n";
         parameters.cameraDirection = VuforiaLocalizer.CameraDirection.BACK;
 
         VuforiaLocalizer vuforiaLocalizer = ClassFactory.getInstance().createVuforia(parameters);
