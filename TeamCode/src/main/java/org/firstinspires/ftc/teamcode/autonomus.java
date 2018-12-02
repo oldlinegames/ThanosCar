@@ -12,6 +12,7 @@ public class autonomus extends LinearOpMode{
     @Override
     public void runOpMode() throws InterruptedException {
 <<<<<<< HEAD
+<<<<<<< HEAD
         thanosCar.setTelemetry(telemetry);
         thanosCar.init(hardwareMap);
 
@@ -26,6 +27,15 @@ public class autonomus extends LinearOpMode{
 
         thanosCar.setWheelEncoderMode();
         waitForStart();
+=======
+        thanosCar = new Hardware(this);
+        thanosCar.setTelemetry(telemetry);
+        thanosCar.init(hardwareMap);
+        thanosCar.reverseWheels();
+
+        thanosCar.setWheelEncoderMode();
+        waitForStart();
+>>>>>>> parent of bd241ab... nj
 
         thanosCar.ocDontLift(1);
         sleep(1000);
@@ -39,6 +49,9 @@ public class autonomus extends LinearOpMode{
         sleep(500);
         thanosCar.marker.setPosition(0);
         sleep(500);
+<<<<<<< HEAD
+>>>>>>> parent of bd241ab... nj
+=======
 >>>>>>> parent of bd241ab... nj
 
 

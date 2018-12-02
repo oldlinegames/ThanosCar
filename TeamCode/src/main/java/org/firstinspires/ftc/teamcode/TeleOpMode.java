@@ -24,8 +24,11 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 public class TeleOpMode extends OpMode {
     private static final double CLAW_ARM_SPEED = .25;
 <<<<<<< HEAD
+<<<<<<< HEAD
     private final Hardware thanosCar = new Hardware();
 =======
+=======
+>>>>>>> parent of bd241ab... nj
     private final Hardware thanosCar = new Hardware(hardwareMap, telemetry);
     private OmaeTron omaeWa  = new OmaeTron();
     private apagando sombra = new apagando();
@@ -37,8 +40,12 @@ public class TeleOpMode extends OpMode {
     @Override
     public void init() {
 <<<<<<< HEAD
+<<<<<<< HEAD
         thanosCar.setTelemetry(telemetry);
         thanosCar.init(hardwareMap);
+=======
+        thanosCar=
+>>>>>>> parent of bd241ab... nj
 =======
         thanosCar=
 >>>>>>> parent of bd241ab... nj

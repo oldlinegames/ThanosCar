@@ -353,6 +353,7 @@ public class Hardware {
         telemetry.update();
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 
     void setTargetPos(OpenGLMatrix targetPos) {
         this.targetPos = targetPos;
@@ -425,6 +426,8 @@ public class Hardware {
         }
         return lastPos;
     }
+=======
+>>>>>>> parent of bd241ab... nj
 =======
 >>>>>>> parent of bd241ab... nj
     /*void initVuforia() {
