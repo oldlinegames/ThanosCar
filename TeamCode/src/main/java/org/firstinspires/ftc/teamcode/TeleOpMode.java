@@ -36,7 +36,7 @@ public class TeleOpMode extends OpMode {
 
     @Override
     public void start() {
-        thanosCar.setServoPositions();
+        thanosCar.setServoPositions(0);
     }
 
     @Override
@@ -46,7 +46,7 @@ public class TeleOpMode extends OpMode {
         thanosCar.setWheelPower(gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x, //backLeft
                                 gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x, //frontLeft
                                 gamepad1.left_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x, //frontRight
-                                gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x, //backRight
+                                gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x //backRight
         );
         
         /*if(!thanosCar.deadZone(gamepad1.right_stick_x) && thanosCar.deadZone(gamepad1.right_stick_y)){

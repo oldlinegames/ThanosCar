@@ -484,18 +484,18 @@ public class Hardware {
             
             //turnLeft(-locationAngle, .3, 5_000, opMode);
             //driveForward(diff.getData()[0], .3, 5_000, opMode);
-            thanosCar.encoderTurn(-locationAngle,-1);
-            thanosCar.encoderDrive[0.2, diff.getData()[0], diff.getData()[0], 5];
+            encoderTurn(-locationAngle,-1);
+            encoderDrive(0.2, diff.getData()[0], diff.getData()[0], 5);
 
             // Go to y of target
             //turnLeft(90, .3, 5_000, opMode);
             //driveForward(diff.getData()[1], .3, 5_000, opMode);
-            thanosCar.encoderTurn(90, -1);
-            thanosCar.encoderDrive(0.2, diff.getData()[1], diff.getData()[1], 5);
+            encoderTurn(90, -1);
+            encoderDrive(0.2, diff.getData()[1], diff.getData()[1], 5);
 
             // Go to angle of target
             //turnLeft(targetAngle - 90, .3, 5_000, opMode);
-            thanosCar.encoderTurn(targetAngle - 90, -1);
+            encoderTurn(targetAngle - 90, -1);
 
             return true;
         }
