@@ -2,17 +2,10 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
-
-import org.firstinspires.ftc.robotcore.external.matrices.OpenGLMatrix;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesOrder;
-import org.firstinspires.ftc.robotcore.external.navigation.AxesReference;
-import org.firstinspires.ftc.robotcore.external.navigation.Orientation;
 
 @Autonomous
 
-public class autonomus extends LinearOpMode{
+public class autonomusRed extends LinearOpMode{
         private Hardware thanosCar;
 
 
@@ -37,7 +30,7 @@ public class autonomus extends LinearOpMode{
         thanosCar.encoderTurn(90,-1);
         thanosCar.encoderDrive(0.2,28,28,10);
         thanosCar.encoderTurn(20,1);
-        thanosCar.encoderDrive(0.1,10,10,5);
+        //thanosCar.encoderDrive(0.1,10,10,5);
         thanosCar.encoderTurn(85,1);
         //thanosCar.encoderTurn(110,1);
         thanosCar.encoderDrive(0.2,45,45,5);

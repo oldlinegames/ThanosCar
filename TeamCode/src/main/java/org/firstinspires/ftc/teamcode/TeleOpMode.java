@@ -1,5 +1,8 @@
 package org.firstinspires.ftc.teamcode;
 
+import android.content.Context;
+import android.media.MediaPlayer;
+
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -23,53 +26,31 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 @TeleOp
 public class TeleOpMode extends OpMode {
     private static final double CLAW_ARM_SPEED = .25;
-<<<<<<< HEAD
-<<<<<<< HEAD
-    private final Hardware thanosCar = new Hardware();
-=======
-=======
->>>>>>> parent of bd241ab... nj
-    private final Hardware thanosCar = new Hardware(hardwareMap, telemetry);
+    private Hardware thanosCar;
     private OmaeTron omaeWa  = new OmaeTron();
     private apagando sombra = new apagando();
->>>>>>> parent of bd241ab... nj
     private double wheelSpeed = 1;
+    private boolean lastYPressed = false;
+    private boolean slowMode = false;
     //private double slideSpeed = 1;
     //private boolean prevB1, prevX1, prevX2, prevY2, reverse, clawControl;
 
     @Override
     public void init() {
-<<<<<<< HEAD
-<<<<<<< HEAD
-        thanosCar.setTelemetry(telemetry);
-        thanosCar.init(hardwareMap);
-=======
-        thanosCar=
->>>>>>> parent of bd241ab... nj
-=======
-        thanosCar=
->>>>>>> parent of bd241ab... nj
+        thanosCar=new Hardware(hardwareMap,telemetry);
     }
 
     @Override
     public void start() {
         thanosCar.setServoPositions(0);
+        thanosCar.reverseWheels();
     }
 
     @Override
     public void loop() {
+        lastYPressed = gamepad1.y;
         thanosCar.ocLift(gamepad1.right_trigger);
         thanosCar.ocDontLift(gamepad1.left_trigger);
-<<<<<<< HEAD
-        thanosCar.setWheelPower(gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x, //backLeft
-                                gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x, //frontLeft
-                                gamepad1.left_stick_y + gamepad1.right_stick_x - gamepad1.left_stick_x, //frontRight
-                                gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x //backRight
-        );
-        
-        /*if(!thanosCar.deadZone(gamepad1.right_stick_x) && thanosCar.deadZone(gamepad1.right_stick_y)){
-            
-=======
         if(slowMode){
             thanosCar.setWheelPower((gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x)/3,
                     (gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x)/3,
@@ -78,10 +59,10 @@ public class TeleOpMode extends OpMode {
             );
         }
         else{
-            thanosCar.setWheelPower(gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x,
-                    gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x,
-                    gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x,
-                    gamepad1.left_stick_y+ gamepad1.right_stick_x - gamepad1.left_stick_x
+            thanosCar.setWheelPower((gamepad1.left_stick_y + gamepad1.right_stick_x + gamepad1.left_stick_x)*0.5,
+                    (gamepad1.left_stick_y - gamepad1.right_stick_x - gamepad1.left_stick_x)*0.5,
+                    (gamepad1.left_stick_y - gamepad1.right_stick_x + gamepad1.left_stick_x)*0.5,
+                    (gamepad1.left_stick_y+ gamepad1.right_stick_x - gamepad1.left_stick_x)*0.5
             );
         }
 
@@ -108,7 +89,7 @@ public class TeleOpMode extends OpMode {
         else if(gamepad1.b){
             thanosCar.setServoPositions(-1);
         }
-        
+
         else{
             thanosCar.setServoPositions(0);
         }
@@ -133,16 +114,14 @@ public class TeleOpMode extends OpMode {
             telemetry.addLine("Slow Mode Disabled");
             telemetry.update();
         }
-
-        thanosCar.colorSensorTest();
+        //thanosCar.colorSensorTest();
         /*if(gamepad1.x){
             omaeWa.start(this.hardwareMap.appContext);
         }
         if(gamepad1.y){
             sombra.start(this.hardwareMap.appContext);
->>>>>>> parent of bd241ab... nj
         }*/
-        
+
         /*thanosCar.setWheelPower(gamepad1.right_stick_y,gamepad1.left_stick_y
                 /*(reverse ? gamepad1.right_stick_y : -gamepad1.left_stick_y) * wheelSpeed,
                 (reverse ? gamepad1.left_stick_y : -gamepad1.right_stick_y) * wheelSpeed);*/
@@ -182,7 +161,6 @@ public class TeleOpMode extends OpMode {
         if (gamepad2.x && !prevX2) {
             thanosCar.toggleClaw();
         }
-
         if (gamepad2.dpad_up) {
             slideSpeed = 1;
         }
@@ -192,7 +170,6 @@ public class TeleOpMode extends OpMode {
         if (gamepad2.dpad_down) {
             slideSpeed = .1;
         }
-
         if (gamepad2.left_trigger > 0) {
             thanosCar.setLeftSlidePower(slideSpeed);
         } else if (gamepad2.left_bumper) {
@@ -207,9 +184,7 @@ public class TeleOpMode extends OpMode {
         } else {
             thanosCar.setRightSlidePower(0);
         }
-
         thanosCar.setJewelSweeperPosition(.5);
-
         prevX1 = gamepad1.x;
         prevX2 = gamepad2.x;
         prevB1 = gamepad1.b;
@@ -217,5 +192,4 @@ public class TeleOpMode extends OpMode {
     }
 
 
-    }
-
+}
