@@ -101,56 +101,6 @@ public class Hardware {
 
     }
 
-    /*void init(HardwareMap hardwareMap) {
-        spinner = hardwareMap.dcMotor.get("spinner");
-        lifter = hardwareMap.dcMotor.get("lifter");
-        slider = hardwareMap.dcMotor.get("slider");
-        frontLeft = hardwareMap.dcMotor.get("frontLeft");
-        frontRight = hardwareMap.dcMotor.get("frontRight");
-        backLeft = hardwareMap.dcMotor.get("backLeft");
-        backRight = hardwareMap.dcMotor.get("backRight");
-        spinnyLeft = hardwareMap.crservo.get("left");
-        spinnyRight = hardwareMap.crservo.get("right");
-        doorJaunt = hardwareMap.servo.get("door");
-        marker = hardwareMap.servo.get("marker");
-        flipper = hardwareMap.servo.get("flipper");
-        colorJaunt = hardwareMap.colorSensor.get("colorJaunt");
-       /* lifter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        lifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);*/
-
-        /*leftSlide     = hardwareMap.dcMotor.get("leftSlide");
-        rightSlide    = hardwareMap.dcMotor.get("rightSlide");
-        leftConveyor  = hardwareMap.dcMotor.get("leftConveyor");
-        rightConveyor = hardwareMap.dcMotor.get("rightConveyor");
-        leftWheel     = hardwareMap.dcMotor.get("leftWheel");
-        rightWheel    = hardwareMap.dcMotor.get("rightWheel");
-        centerWheel   = hardwareMap.dcMotor.get("centerWheel");
-        clawArm       = hardwareMap.dcMotor.get("clawArm");
-        flipper       = hardwareMap.servo.get("flipper");
-        claw          = hardwareMap.servo.get("claw");
-        jewelSweeper  = hardwareMap.servo.get("jewelSweeper");
-        colorSensor   = hardwareMap.colorSensor.get("colorSensor");
-        leftSlide .setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftWheel .setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightWheel.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        clawArm   .setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftWheel .setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightWheel.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftSlide .setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        rightSlide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        clawArm   .setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        leftSlide    .setDirection(DcMotorSimple.Direction.REVERSE);
-        rightConveyor.setDirection(DcMotorSimple.Direction.REVERSE);
-        rightWheel   .setDirection(DcMotorSimple.Direction.REVERSE);
-        centerWheel  .setDirection(DcMotorSimple.Direction.REVERSE);
-        wheelBrake(false);
-        leftSlide .setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        rightSlide.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        clawArm   .setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-        telemetry.addLine("Initialized Hardware");
-        telemetry.update();
-    }*/
 
     void reverseWheels(){
         backLeft.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -162,16 +112,19 @@ public class Hardware {
         frontRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backLeft.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         backRight.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        lifter.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         frontRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         backRight.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        lifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
         frontLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         frontRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backLeft.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         backRight.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        lifter.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         telemetry.addLine("Encoders Initialized");
         telemetry.update();
@@ -187,6 +140,49 @@ public class Hardware {
     void ocSlide(float slidePower){
         slider.setPower(slidePower/2);
     }
+
+    void encoderLift(int counts){
+        int newLifterTarget;
+
+        // Ensure that the opmode is still active
+        // Determine new target position, and pass to motor controller
+        newLifterTarget = frontLeft.getCurrentPosition() + counts;
+
+
+        backLeft.setTargetPosition(newLifterTarget);
+        // Turn On RUN_TO_POSITION
+        lifter.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+
+        // reset the timeout time and start motion.
+        runtime.reset();
+        lifter.setPower(Math.abs(1));
+
+
+            // keep looping while we are still active, and there is time left, and both motors are running.
+            // Note: We use (isBusy() && isBusy()) in the loop test, which means that when EITHER motor hits
+            // its target position, the motion will stop.  This is "safer" in the event that the robot will
+            // always end the motion as soon as possible.
+            // However, if you require that BOTH motors have finished their moves before the robot continues
+            // onto the next step, use (isBusy() || isBusy()) in the loop test.
+            while (OpModeJaunt.opModeIsActive() &&
+                    (runtime.seconds() < 10) &&
+                    (lifter.isBusy())) {
+
+                // Display it for the driver.
+                telemetry.addData("Path1", "Running to %7d", newLifterTarget);
+                telemetry.addData("Path2", "Running at %7d",
+                        lifter.getCurrentPosition());
+                telemetry.update();
+            }
+
+            // Stop all motion;
+            lifter.setPower(0);
+            // Turn off RUN_TO_POSITION
+            lifter.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+            OpModeJaunt.sleep(250);   // optional pause after each move
+    }
+
 
     void setWheelPower(double frontLeftPower, double frontRightPower, double backLeftPower, double backRightPower) {
         backLeft.setPower(backLeftPower);
@@ -330,24 +326,12 @@ public class Hardware {
 
         // reset the timeout time and start motion.
         runtime.reset();
-        if(rightInches>30){
-            frontLeft.setPower(Math.abs(speed));
-            backLeft.setPower(Math.abs(speed));
-            frontRight.setPower(Math.abs(speed));
-            backRight.setPower(Math.abs(speed));
-            if((newFrontRightTarget-frontRight.getCurrentPosition())/COUNTS_PER_INCH<10){
-                frontLeft.setPower(Math.abs(0.1));
-                backLeft.setPower(Math.abs(0.1));
-                frontRight.setPower(Math.abs(0.1));
-                backRight.setPower(0.1);
-            }
-        }
-        else {
-            frontLeft.setPower(Math.abs(speed));
-            backLeft.setPower(Math.abs(speed));
-            frontRight.setPower(Math.abs(speed));
-            backRight.setPower(Math.abs(speed));
-        }
+
+        frontLeft.setPower(Math.abs(speed));
+        backLeft.setPower(Math.abs(speed));
+        frontRight.setPower(Math.abs(speed));
+        backRight.setPower(Math.abs(speed));
+
 
 
         // keep looping while we are still active, and there is time left, and both motors are running.
